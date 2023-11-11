@@ -11,19 +11,45 @@
         android:layout_height="729dp"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp"
-        tools:ignore="MissingConstraints">
+        tools:layout_editor_absoluteY="1dp">
 
-        <Button
-            android:id="@+id/start"
+
+
+        <EditText
+            android:id="@+id/etA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="start" />
+            android:ems="10"
+            android:inputType="text"
+            android:text="Name" />
 
-        <Button
-            android:id="@+id/stop"
+        <EditText
+            android:id="@+id/etB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="stop" />
+            android:ems="10"
+            android:inputType="text"
+            android:text="Name" />
+
+        <EditText
+            android:id="@+id/etC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:text="Name" />
+
+        <Button
+            android:id="@+id/buttonLCM"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/buttonPrime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
