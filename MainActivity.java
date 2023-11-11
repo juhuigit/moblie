@@ -2,61 +2,37 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.util.Log;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    SQLiteDatabase sqliteDB = null;
-    EditText id, name, phone;
-    Button button;
-    TextView result;
+public class MainActivity extends AppCompatActivity {
+    BroadcastReceiver wifistateReceiver = new BroadcastReceiver() {
+        public void onReceive (Context context, Intent intent) {
+            int wifistate = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+            switch (wifistate) {
+                case WifiManager.WIFI_STATE_ENABLED:
+                    Log.d("TEST", "WIFI_STATE_ENABLED");
+                    break;
+                case WifiManager.WIFI_STATE_DISABLED:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        id = (EditText) findViewById(R.id.editTextID);
-        name = (EditText) findViewById(R.id.editTextName);
-        phone = (EditText) findViewById(R.id.editTextPhone);
-        button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(this);
-        result = (TextView) findViewById(R.id.textView);
-        try{
-            sqliteDB = openOrCreateDatabase("sample.db", MODE_PRIVATE, null);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-        }
-        String sqlCreateTable =
-                "CREATE TABLE IF NOT EXISTS CONTACT_T(ID INTEGER NOT NULL, NAME TEXT, PHONE TEXT)";
-        sqliteDB.execSQL(sqlCreateTable);
+        this.registerReceiver(this.wifistateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
     }
 
-    @Override
-    public void onClick(View view) {
-        String sqlInsert =
-                "INSERT INTO CONTACT_T(ID, NAME, PHONE) VALUES ('" + id.getText().toString() + "' , '"
-                + name.getText().toString() +"' , '"
-                + phone.getText().toString() + "')";
-        sqliteDB.execSQL(sqlInsert);
-
-        String sqlSelect = "SELECT * FROM CONTACT_T";
-        Cursor cursor = null;
-        cursor = sqliteDB.rawQuery(sqlSelect, null);
-        String tableResult = "";
-        while (cursor.moveToNext()){
-            tableResult += cursor.getInt(0) + ", " +
-                    cursor.getString(1) +", " +
-                    cursor.getString(2) + "\n";
-        }
-        result.setText(tableResult);
+    protected void onDestroy(){
+        super.onDestroy();
+        this.unregisterReceiver(wifistateReceiver);
     }
 }
