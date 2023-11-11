@@ -1,38 +1,58 @@
 package com.example.myapplication;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.wifi.WifiManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.IBinder;
+import android.view.View;
+import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
-    BroadcastReceiver wifistateReceiver = new BroadcastReceiver() {
-        public void onReceive (Context context, Intent intent) {
-            int wifistate = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-            switch (wifistate) {
-                case WifiManager.WIFI_STATE_ENABLED:
-                    Log.d("TEST", "WIFI_STATE_ENABLED");
-                    break;
-                case WifiManager.WIFI_STATE_DISABLED:
-                    break;
-            }
-        }
-    };
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    Button buttonstart, buttonstop;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.registerReceiver(this.wifistateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+
+        buttonstart = (Button) findViewById(R.id.start);
+        buttonstop = (Button) findViewById(R.id.stop);
+        buttonstart.setOnClickListener(this);
+        buttonstop.setOnClickListener(this);
     }
 
-    protected void onDestroy(){
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.start) {
+            startService(new Intent(this, MyService.class));
+        } else {
+            stopService(new Intent(this, MyService.class));
+        }
+    }
+}
+
+class MyService extends Service {
+    public MyService(){}
+    MediaPlayer player;
+
+    public IBinder onBind(Intent intent) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        player = MediaPlayer.create(this, R.raw.just_dance);
+        player.setLooping(true);
+        player.start();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(wifistateReceiver);
+        player.stop();
     }
 }
