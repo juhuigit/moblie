@@ -1,58 +1,58 @@
 package com.example.myapplication;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Service;
-import android.content.Intent;
-import android.media.MediaPlayer;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    EditText etA, etB, etC;
+    Button buttonLCM, buttonPrime;
+    IMyAidInterface mClac;
+    ServiceConnection srcConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mClac = IMyAidlInterface.Stub.asInterface(iBinder);
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
 
-    Button buttonstart, buttonstop;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        buttonstart = (Button) findViewById(R.id.start);
-        buttonstop = (Button) findViewById(R.id.stop);
-        buttonstart.setOnClickListener(this);
-        buttonstop.setOnClickListener(this);
+        etA = (EditText) findViewById(R.id.etA);
+        etB = (EditText) findViewById(R.id.etB);
+        etC = (EditText) findViewById(R.id.etC);
+
+        buttonLCM = (Button) findViewById(buttonLCM);
+        buttonPrime = (Button) findViewById(buttonPrime);
+
+        buttonLCM.setOnClickListener(this);
+        buttonPrime.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.start) {
-            startService(new Intent(this, MyService.class));
-        } else {
-            stopService(new Intent(this, MyService.class));
+        if (view.getId() == R.id.buttonLCM) {
+            int LCM = 0;
+            try {
+                LCM = mClac.getLCM(Integer.parseInt(etA.getText().toString()),
+                        Integer.parseInt(etB.getText().toString()));
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
-}
-
-class MyService extends Service {
-    public MyService(){}
-    MediaPlayer player;
-
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        player = MediaPlayer.create(this, R.raw.just_dance);
-        player.setLooping(true);
-        player.start();
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        player.stop();
     }
 }
